@@ -158,38 +158,6 @@ const plants = [
         height: 0.6,
         sunlight: "Full Sun",
         bloomSeason: "Fall"
-    },
-    {
-        name: "Sedum",
-        type: "Succulent",
-        color: "Pink",
-        height: 0.45,
-        sunlight: "Full Sun",
-        bloomSeason: "Fall"
-    },
-    {
-        name: "Camellia",
-        type: "Shrub",
-        color: "Pink",
-        height: 2.5,
-        sunlight: "Partial Shade",
-        bloomSeason: "Winter"
-    },
-    {
-        name: "Witch Hazel",
-        type: "Shrub",
-        color: "Yellow",
-        height: 3.5,
-        sunlight: "Partial Shade",
-        bloomSeason: "Winter"
-    },
-    {
-        name: "Snowdrop",
-        type: "Flower",
-        color: "White",
-        height: 0.15,
-        sunlight: "Shade",
-        bloomSeason: "Winter"
     }
 ];
 
