@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plant Collection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1>Plant Collection</h1>
+      <p>Browse the collection and see how the plants compare.</p>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Summary -->
+    <section class="panel" aria-labelledby="summary-heading">
+      <h2 id="summary-heading">Collection summary</h2>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <span class="stat-label">Number of plants</span>
+          <span class="stat-value" id="total-plants"></span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Average height</span>
+          <span class="stat-value" id="average-height"></span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Tallest plant</span>
+          <span class="stat-value" id="tallest-plant"></span>
+          <span class="stat-note" id="tallest-detail"></span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Shortest plant</span>
+          <span class="stat-value" id="shortest-plant"></span>
+          <span class="stat-note" id="shortest-detail"></span>
+        </div>
+      </div>
+
+      <div class="breakdown-grid">
+        <div class="breakdown">
+          <h3>By bloom season</h3>
+          <ul id="season-counts" class="bar-list"></ul>
+        </div>
+        <div class="breakdown">
+          <h3>By sunlight requirement</h3>
+          <ul id="sunlight-counts" class="bar-list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Plant list -->
+    <section class="panel" aria-labelledby="plants-heading">
+      <h2 id="plants-heading">Browse plants</h2>
+
+      <div class="controls">
+        <button type="button" id="sort-btn">Sort A-Z</button>
+
+        <label>Sunlight
+          <select id="sunlight-filter"><option value="all">All</option></select>
+        </label>
+
+        <label>Bloom season
+          <select id="season-filter"><option value="all">All</option></select>
+        </label>
+
+        <label>Height
+          <select id="height-filter">
+            <option value="all">All</option>
+            <option value="short">Short (under 50 cm)</option>
+            <option value="medium">Medium (50-100 cm)</option>
+            <option value="tall">Tall (over 100 cm)</option>
+          </select>
+        </label>
+
+        <button type="button" id="reset-btn" class="secondary">Reset</button>
+      </div>
+
+      <p id="result-count" class="result-count" aria-live="polite"></p>
+      <div id="plant-list" class="plant-grid"></div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
