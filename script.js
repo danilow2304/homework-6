@@ -193,78 +193,20 @@ const plants = [
     }
 ];
 
-function display(plantsArray) {
-    const plantList = document.getElementById("plantList");
-    if (plantsArray.length === 0) {
-        plantList.innerHTML = "<p>No plants match.</p>";
-        return;
-    }
-    plantList.innerHTML = plantsArray.map((plant) => `
-        <div class="plant">
-            <h2>${plant.name}</h2>
-            <p>Type: ${plant.type}</p>
-            <p>Color: ${plant.color}</p>
-            <p>Height: ${plant.height} meters</p>
-            <p>Sunlight: ${plant.sunlight}</p>
-            <p>Blooms: ${plant.bloomSeason}</p>
-        </div>
-    `).join("");
-}
 
-function showAllPlants() {
-    display(plants);
-}
+const SEASONS = ["Spring", "Summer", "Fall", "Winter"];
+const SUNLIGHTS = ["Full Sun", "Partial Shade", "Shade"];
 
-function sortAlphabetically() {
-    const sorted = [...plants].sort((a, b) => a.name.localeCompare(b.name));
-    display(sorted);
-}
+let sortedAZ = false;
+let foundPlant = null;
 
-function filterBySunlight() {
-    const input = prompt("Enter sunlight needs (Full Sun, Partial Shade, Shade):");
-    if (!input) return;
-    const search = input.trim().toLowerCase();
-    display(plants.filter((p) => p.sunlight.toLowerCase() === search));
-}
 
-function filterByBloomSeason() {
-    const input = prompt("Enter a bloom season (Spring, Summer, Fall, Winter):");
-    if (!input) return;
-    const search = input.trim().toLowerCase();
-    display(plants.filter((p) => p.bloomSeason.toLowerCase() === search));
-}
-
-function filterByHeight() {
-    const input = prompt("Show plants at least this tall (in meters):");
-    if (!input) return;
-    const minHeight = parseFloat(input);
-    if (isNaN(minHeight)) {
-        alert("Please enter a number.");
-        return;
-    }
-    display(plants.filter((p) => p.height >= minHeight));
-}
-
-function findPlant() {
-    const input = prompt("Enter the name of the plant to find:");
-    if (!input) return;
-    const found = plants.find((p) => p.name.toLowerCase() === input.trim().toLowerCase());
-    if (found) {
-        display([found]);
-    } else {
-        alert("Plant not found.");
-    }
-}
 
 function countBy(property) {
     return plants.reduce((counts, p) => {
         counts[p[property]] = (counts[p[property]] || 0) + 1;
         return counts;
     }, {});
-}
-
-function countList(counts, order) {
-    return order.map((label) => `<li>${label}: <strong>${counts[label] || 0}</strong></li>`).join("");
 }
 
 function plantStats() {
@@ -274,31 +216,139 @@ function plantStats() {
     const tallest = plants.reduce((max, p) => (p.height > max.height ? p : max));
     const shortest = plants.reduce((min, p) => (p.height < min.height ? p : min));
 
-    const seasonCounts = countBy("bloomSeason");
-    const sunlightCounts = countBy("sunlight");
+    document.getElementById("total-plants").textContent = plants.length;
+    document.getElementById("average-height").textContent = averageHeight + " m";
+    document.getElementById("tallest-plant").textContent = tallest.name;
+    document.getElementById("tallest-detail").textContent = tallest.height + " m";
+    document.getElementById("shortest-plant").textContent = shortest.name;
+    document.getElementById("shortest-detail").textContent = shortest.height + " m";
 
-    document.getElementById("stats").innerHTML = `
-        <h2>Plant Statistics</h2>
-
-        <div class="stat-boxes">
-            <div class="stat-box"><span>Number of Plants</span><strong>${plants.length}</strong></div>
-            <div class="stat-box"><span>Average Height</span><strong>${averageHeight} m</strong></div>
-            <div class="stat-box"><span>Tallest Plant</span><strong>${tallest.name}</strong><span>${tallest.height} m</span></div>
-            <div class="stat-box"><span>Shortest Plant</span><strong>${shortest.name}</strong><span>${shortest.height} m</span></div>
-        </div>
-
-        <div class="stat-lists">
-            <div>
-                <h3>Plants by Bloom Season</h3>
-                <ul>${countList(seasonCounts, ["Spring", "Summer", "Fall", "Winter"])}</ul>
-            </div>
-            <div>
-                <h3>Plants by Sunlight</h3>
-                <ul>${countList(sunlightCounts, ["Full Sun", "Partial Shade", "Shade"])}</ul>
-            </div>
-        </div>
-    `;
+    showCounts("season-counts", countBy("bloomSeason"), SEASONS);
+    showCounts("sunlight-counts", countBy("sunlight"), SUNLIGHTS);
 }
 
-showAllPlants();
-plantStats();
+function showCounts(elementId, counts, order) {
+    document.getElementById(elementId).innerHTML = order.map((label) => {
+        const count = counts[label] || 0;
+        const percent = (count / plants.length) * 100;
+        return `
+            <li class="bar-row">
+                <span class="bar-label">${label}</span>
+                <span class="bar-track"><span class="bar-fill" style="width:${percent}%"></span></span>
+                <span class="bar-count">${count}</span>
+            </li>`;
+    }).join("");
+}
+
+
+
+function display(plantsArray) {
+    const list = document.getElementById("plant-list");
+    document.getElementById("result-count").textContent =
+        "Showing " + plantsArray.length + " of " + plants.length + " plants";
+
+    if (plantsArray.length === 0) {
+        list.innerHTML = "<p class='empty'>No plants match.</p>";
+        return;
+    }
+    list.innerHTML = plantsArray.map((plant) => `
+        <div class="plant-card">
+            <h3>${plant.name}</h3>
+            <p>Type: ${plant.type}</p>
+            <p>Color: ${plant.color}</p>
+            <p>Height: ${plant.height} meters</p>
+            <p>Sunlight: ${plant.sunlight}</p>
+            <p>Blooms: ${plant.bloomSeason}</p>
+        </div>
+    `).join("");
+}
+
+function heightMatches(plant, range) {
+    if (range === "short") return plant.height < 0.5;
+    if (range === "medium") return plant.height >= 0.5 && plant.height <= 1;
+    if (range === "tall") return plant.height > 1;
+    return true;
+}
+
+function updatePlants() {
+    if (foundPlant) {
+        display([foundPlant]);
+        return;
+    }
+
+    const sunlight = document.getElementById("sunlight-filter").value;
+    const season = document.getElementById("season-filter").value;
+    const height = document.getElementById("height-filter").value;
+
+    let result = plants
+        .filter((p) => sunlight === "all" || p.sunlight === sunlight)
+        .filter((p) => season === "all" || p.bloomSeason === season)
+        .filter((p) => heightMatches(p, height));
+
+    if (sortedAZ) {
+        result = [...result].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    display(result);
+}
+
+function findPlant() {
+    const name = document.getElementById("find-input").value.trim().toLowerCase();
+    if (!name) return;
+
+    const found = plants.find((p) => p.name.toLowerCase() === name);
+    if (found) {
+        foundPlant = found;
+        display([found]);
+    } else {
+        foundPlant = null;
+        document.getElementById("plant-list").innerHTML = "";
+        document.getElementById("result-count").textContent = "Plant not found. Check the spelling and try again.";
+    }
+}
+
+
+
+function fillSelect(selectId, values) {
+    document.getElementById(selectId).innerHTML +=
+        values.map((v) => `<option value="${v}">${v}</option>`).join("");
+}
+
+function setUp() {
+    fillSelect("sunlight-filter", SUNLIGHTS);
+    fillSelect("season-filter", SEASONS);
+
+    ["sunlight-filter", "season-filter", "height-filter"].forEach((id) => {
+        document.getElementById(id).addEventListener("change", () => {
+            foundPlant = null;
+            updatePlants();
+        });
+    });
+
+    document.getElementById("sort-btn").addEventListener("click", () => {
+        sortedAZ = !sortedAZ;
+        document.getElementById("sort-btn").textContent = sortedAZ ? "Sorted A-Z (click to undo)" : "Sort A-Z";
+        foundPlant = null;
+        updatePlants();
+    });
+
+    document.getElementById("find-btn").addEventListener("click", findPlant);
+    document.getElementById("find-input").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") findPlant();
+    });
+
+    document.getElementById("reset-btn").addEventListener("click", () => {
+        ["sunlight-filter", "season-filter", "height-filter"].forEach((id) => {
+            document.getElementById(id).value = "all";
+        });
+        document.getElementById("find-input").value = "";
+        document.getElementById("sort-btn").textContent = "Sort A-Z";
+        sortedAZ = false;
+        foundPlant = null;
+        updatePlants();
+    });
+
+    plantStats();
+    updatePlants();
+}
+
+setUp();

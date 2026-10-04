@@ -11,13 +11,11 @@
 </head>
 <body>
   <header class="site-header">
-    <div class="container">
-      <h1>Plant Collection</h1>
-      <p>Browse the collection and see how the plants compare.</p>
-    </div>
+    <h1>Plant Collection</h1>
+    <p>Browse the collection and see how the plants compare.</p>
   </header>
 
-  <main class="container">
+  <main>
 
     <!-- Summary -->
     <section class="panel" aria-labelledby="summary-heading">
@@ -74,11 +72,16 @@
         <label>Height
           <select id="height-filter">
             <option value="all">All</option>
-            <option value="short">Short (under 50 cm)</option>
-            <option value="medium">Medium (50-100 cm)</option>
-            <option value="tall">Tall (over 100 cm)</option>
+            <option value="short">Short (under 0.5 m)</option>
+            <option value="medium">Medium (0.5 to 1 m)</option>
+            <option value="tall">Tall (over 1 m)</option>
           </select>
         </label>
+
+        <label>Find a plant
+          <input type="text" id="find-input" placeholder="e.g. Rose">
+        </label>
+        <button type="button" id="find-btn">Find</button>
 
         <button type="button" id="reset-btn" class="secondary">Reset</button>
       </div>
