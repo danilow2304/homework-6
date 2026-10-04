@@ -1,97 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Plant Collection</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <title>Plant Collection</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="site-header">
-    <h1>Plant Collection</h1>
-    <p>Browse the collection and see how the plants compare.</p>
-  </header>
 
-  <main>
+    <header>
+        <h1>My Plant Collection</h1>
+        <p>Explore my collection of plants.</p>
+    </header>
 
-    <!-- Summary -->
-    <section class="panel" aria-labelledby="summary-heading">
-      <h2 id="summary-heading">Collection summary</h2>
+    <main>
 
-      <div class="stat-grid">
-        <div class="stat">
-          <span class="stat-label">Number of plants</span>
-          <span class="stat-value" id="total-plants"></span>
+        <h2>Plant Statistics</h2>
+        <div id="stats"></div>
+
+        <h2>My Plants</h2>
+
+        <div class="controls">
+            <button onclick="showAllPlants()">All Plants</button>
+            <button onclick="sortAlphabetically()">Sort A-Z</button>
+
+            <select id="sunlight" onchange="filterBySunlight()">
+                <option value="">Sunlight</option>
+                <option value="Full Sun">Full Sun</option>
+                <option value="Partial Shade">Partial Shade</option>
+                <option value="Shade">Shade</option>
+            </select>
+
+            <select id="season" onchange="filterByBloomSeason()">
+                <option value="">Bloom Season</option>
+                <option value="Spring">Spring</option>
+                <option value="Summer">Summer</option>
+                <option value="Fall">Fall</option>
+                <option value="Winter">Winter</option>
+            </select>
+
+            <select id="height" onchange="filterByHeight()">
+                <option value="">Height</option>
+                <option value="short">Short (under 0.5 m)</option>
+                <option value="medium">Medium (0.5 to 1 m)</option>
+                <option value="tall">Tall (over 1 m)</option>
+            </select>
         </div>
-        <div class="stat">
-          <span class="stat-label">Average height</span>
-          <span class="stat-value" id="average-height"></span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Tallest plant</span>
-          <span class="stat-value" id="tallest-plant"></span>
-          <span class="stat-note" id="tallest-detail"></span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Shortest plant</span>
-          <span class="stat-value" id="shortest-plant"></span>
-          <span class="stat-note" id="shortest-detail"></span>
-        </div>
-      </div>
 
-      <div class="breakdown-grid">
-        <div class="breakdown">
-          <h3>By bloom season</h3>
-          <ul id="season-counts" class="bar-list"></ul>
-        </div>
-        <div class="breakdown">
-          <h3>By sunlight requirement</h3>
-          <ul id="sunlight-counts" class="bar-list"></ul>
-        </div>
-      </div>
-    </section>
+        <div id="plantList"></div>
 
-    <!-- Plant list -->
-    <section class="panel" aria-labelledby="plants-heading">
-      <h2 id="plants-heading">Browse plants</h2>
+    </main>
 
-      <div class="controls">
-        <button type="button" id="sort-btn">Sort A-Z</button>
-
-        <label>Sunlight
-          <select id="sunlight-filter"><option value="all">All</option></select>
-        </label>
-
-        <label>Bloom season
-          <select id="season-filter"><option value="all">All</option></select>
-        </label>
-
-        <label>Height
-          <select id="height-filter">
-            <option value="all">All</option>
-            <option value="short">Short (under 0.5 m)</option>
-            <option value="medium">Medium (0.5 to 1 m)</option>
-            <option value="tall">Tall (over 1 m)</option>
-          </select>
-        </label>
-
-        <label>Find a plant
-          <input type="text" id="find-input" placeholder="e.g. Rose">
-        </label>
-        <button type="button" id="find-btn">Find</button>
-
-        <button type="button" id="reset-btn" class="secondary">Reset</button>
-      </div>
-
-      <p id="result-count" class="result-count" aria-live="polite"></p>
-      <div id="plant-list" class="plant-grid"></div>
-    </section>
-
-  </main>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

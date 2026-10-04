@@ -194,65 +194,17 @@ const plants = [
 ];
 
 
-const SEASONS = ["Spring", "Summer", "Fall", "Winter"];
-const SUNLIGHTS = ["Full Sun", "Partial Shade", "Shade"];
-
-let sortedAZ = false;
-let foundPlant = null;
-
-
-
-function countBy(property) {
-    return plants.reduce((counts, p) => {
-        counts[p[property]] = (counts[p[property]] || 0) + 1;
-        return counts;
-    }, {});
-}
-
-function plantStats() {
-    const totalHeight = plants.reduce((total, p) => total + p.height, 0);
-    const averageHeight = (totalHeight / plants.length).toFixed(2);
-
-    const tallest = plants.reduce((max, p) => (p.height > max.height ? p : max));
-    const shortest = plants.reduce((min, p) => (p.height < min.height ? p : min));
-
-    document.getElementById("total-plants").textContent = plants.length;
-    document.getElementById("average-height").textContent = averageHeight + " m";
-    document.getElementById("tallest-plant").textContent = tallest.name;
-    document.getElementById("tallest-detail").textContent = tallest.height + " m";
-    document.getElementById("shortest-plant").textContent = shortest.name;
-    document.getElementById("shortest-detail").textContent = shortest.height + " m";
-
-    showCounts("season-counts", countBy("bloomSeason"), SEASONS);
-    showCounts("sunlight-counts", countBy("sunlight"), SUNLIGHTS);
-}
-
-function showCounts(elementId, counts, order) {
-    document.getElementById(elementId).innerHTML = order.map((label) => {
-        const count = counts[label] || 0;
-        const percent = (count / plants.length) * 100;
-        return `
-            <li class="bar-row">
-                <span class="bar-label">${label}</span>
-                <span class="bar-track"><span class="bar-fill" style="width:${percent}%"></span></span>
-                <span class="bar-count">${count}</span>
-            </li>`;
-    }).join("");
-}
-
-
-
+// Show a list of plants on the page
 function display(plantsArray) {
-    const list = document.getElementById("plant-list");
-    document.getElementById("result-count").textContent =
-        "Showing " + plantsArray.length + " of " + plants.length + " plants";
+    const plantList = document.getElementById("plantList");
 
     if (plantsArray.length === 0) {
-        list.innerHTML = "<p class='empty'>No plants match.</p>";
+        plantList.innerHTML = "<p>No plants match.</p>";
         return;
     }
-    list.innerHTML = plantsArray.map((plant) => `
-        <div class="plant-card">
+
+    plantList.innerHTML = plantsArray.map((plant) => `
+        <div class="plant">
             <h3>${plant.name}</h3>
             <p>Type: ${plant.type}</p>
             <p>Color: ${plant.color}</p>
@@ -263,92 +215,64 @@ function display(plantsArray) {
     `).join("");
 }
 
-function heightMatches(plant, range) {
-    if (range === "short") return plant.height < 0.5;
-    if (range === "medium") return plant.height >= 0.5 && plant.height <= 1;
-    if (range === "tall") return plant.height > 1;
-    return true;
+function showAllPlants() {
+    display(plants);
 }
 
-function updatePlants() {
-    if (foundPlant) {
-        display([foundPlant]);
-        return;
-    }
-
-    const sunlight = document.getElementById("sunlight-filter").value;
-    const season = document.getElementById("season-filter").value;
-    const height = document.getElementById("height-filter").value;
-
-    let result = plants
-        .filter((p) => sunlight === "all" || p.sunlight === sunlight)
-        .filter((p) => season === "all" || p.bloomSeason === season)
-        .filter((p) => heightMatches(p, height));
-
-    if (sortedAZ) {
-        result = [...result].sort((a, b) => a.name.localeCompare(b.name));
-    }
-    display(result);
+function sortAlphabetically() {
+    const sorted = [...plants].sort((a, b) => a.name.localeCompare(b.name));
+    display(sorted);
 }
 
-function findPlant() {
-    const name = document.getElementById("find-input").value.trim().toLowerCase();
-    if (!name) return;
+function filterBySunlight() {
+    const choice = document.getElementById("sunlight").value;
+    display(plants.filter((p) => p.sunlight === choice));
+}
 
-    const found = plants.find((p) => p.name.toLowerCase() === name);
-    if (found) {
-        foundPlant = found;
-        display([found]);
-    } else {
-        foundPlant = null;
-        document.getElementById("plant-list").innerHTML = "";
-        document.getElementById("result-count").textContent = "Plant not found. Check the spelling and try again.";
+function filterByBloomSeason() {
+    const choice = document.getElementById("season").value;
+    display(plants.filter((p) => p.bloomSeason === choice));
+}
+
+function filterByHeight() {
+    const choice = document.getElementById("height").value;
+
+    if (choice === "short") {
+        display(plants.filter((p) => p.height < 0.5));
+    } else if (choice === "medium") {
+        display(plants.filter((p) => p.height >= 0.5 && p.height <= 1));
+    } else if (choice === "tall") {
+        display(plants.filter((p) => p.height > 1));
     }
 }
 
+// Calculate and show the statistics
+function plantStats() {
+    const totalHeight = plants.reduce((total, p) => total + p.height, 0);
+    const averageHeight = (totalHeight / plants.length).toFixed(2);
 
+    const byHeight = [...plants].sort((a, b) => b.height - a.height);
+    const tallest = byHeight[0];
+    const shortest = byHeight[byHeight.length - 1];
 
-function fillSelect(selectId, values) {
-    document.getElementById(selectId).innerHTML +=
-        values.map((v) => `<option value="${v}">${v}</option>`).join("");
+    document.getElementById("stats").innerHTML = `
+        <p>Number of plants: ${plants.length}</p>
+        <p>Average height: ${averageHeight} meters</p>
+        <p>Tallest plant: ${tallest.name} (${tallest.height} meters)</p>
+        <p>Shortest plant: ${shortest.name} (${shortest.height} meters)</p>
+
+        <h3>Plants by Bloom Season</h3>
+        <p>Spring: ${plants.filter((p) => p.bloomSeason === "Spring").length}</p>
+        <p>Summer: ${plants.filter((p) => p.bloomSeason === "Summer").length}</p>
+        <p>Fall: ${plants.filter((p) => p.bloomSeason === "Fall").length}</p>
+        <p>Winter: ${plants.filter((p) => p.bloomSeason === "Winter").length}</p>
+
+        <h3>Plants by Sunlight</h3>
+        <p>Full Sun: ${plants.filter((p) => p.sunlight === "Full Sun").length}</p>
+        <p>Partial Shade: ${plants.filter((p) => p.sunlight === "Partial Shade").length}</p>
+        <p>Shade: ${plants.filter((p) => p.sunlight === "Shade").length}</p>
+    `;
 }
 
-function setUp() {
-    fillSelect("sunlight-filter", SUNLIGHTS);
-    fillSelect("season-filter", SEASONS);
-
-    ["sunlight-filter", "season-filter", "height-filter"].forEach((id) => {
-        document.getElementById(id).addEventListener("change", () => {
-            foundPlant = null;
-            updatePlants();
-        });
-    });
-
-    document.getElementById("sort-btn").addEventListener("click", () => {
-        sortedAZ = !sortedAZ;
-        document.getElementById("sort-btn").textContent = sortedAZ ? "Sorted A-Z (click to undo)" : "Sort A-Z";
-        foundPlant = null;
-        updatePlants();
-    });
-
-    document.getElementById("find-btn").addEventListener("click", findPlant);
-    document.getElementById("find-input").addEventListener("keydown", (e) => {
-        if (e.key === "Enter") findPlant();
-    });
-
-    document.getElementById("reset-btn").addEventListener("click", () => {
-        ["sunlight-filter", "season-filter", "height-filter"].forEach((id) => {
-            document.getElementById(id).value = "all";
-        });
-        document.getElementById("find-input").value = "";
-        document.getElementById("sort-btn").textContent = "Sort A-Z";
-        sortedAZ = false;
-        foundPlant = null;
-        updatePlants();
-    });
-
-    plantStats();
-    updatePlants();
-}
-
-setUp();
+showAllPlants();
+plantStats();
